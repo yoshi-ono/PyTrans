@@ -1,0 +1,11 @@
+Hi,
+I am currently using your repo to do some experiments, but when I was using PPO with rl-baselines3-zoo and multiprocessing, this error showed up:
+
+So, may I know what's your settings or any suggestion, please? Some procedures when you did experiment and results would be much appreciated. Thank you. By the way, I am currently using ddpg to run it, and this error is not showing up. So, is it might be a multiprocessing issue?
+
+I could not reproduce your situation but I updated some code for stable-baselines3 support. I needed to change observation space from [0.0, 1.0] to [0, 255] to use stable-baselines3's CNN policy.
+
+Also there are simple example RL code to learn and play stable-baselines3.
+https://github.com/wbap/PyLIS/blob/master/gym-foodhunting/examples/example_rl.py
+
+For your case, it looks like a PyBullet's bug if object_id is a valid ID. I will test it on multiprocessing env.

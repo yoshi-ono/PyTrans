@@ -1,0 +1,2 @@
+text="Hi,
+I am currently using your repo to do some experiments, but when I was using PPO with rl-baselines3-zoo and multiprocessing, this error showed up:"
