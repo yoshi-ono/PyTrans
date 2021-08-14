@@ -8,7 +8,7 @@ import re
 api_url = "https://script.google.com/macros/s/AKfycbzKjxnq7rQOY-GDPHIheMeRJ0k_Xc29Xmvi4GL808KFuCQ9pa7DmNGRffAC7qChVoTC/exec"
 source = "en"
 target = "ja"
-input_file = "PyLIS_README.md"
+input_file = "gym-foodhunting_README.md"
 
 def translate(text_box):
     print(text_box)
@@ -30,23 +30,41 @@ def translate(text_box):
     print(trans_box)
     return trans_box
 
+def trans_comment(line):
+    ret = {'comment' : False, 'trans' : ""}
+
+    str = line.strip()
+    if (str == ''):
+        return ret
+        
+    pos = str.find('#')
+    if (pos >= 0):
+        str = str[pos:].strip('# ')
+        ret['comment'] = True
+        ret['trans'] = translate(str)
+
+        if (ret['comment'] and str == ret['trans']):
+            ret['trans'] = ""
+
+    return ret
+
 def trans_topic(line):
     ret = {'topic' : False, 'trans' : ""}
 
-    strip = line.strip()
-    if (strip == ''):
+    str = line.strip()
+    if (str == ''):
         return ret
         
-    if (strip[0] == '#'):
-        strip = strip.strip('# ')
+    if (str[0] == '#'):
+        str = str.strip('# ')
         ret['topic'] = True
-        ret['trans'] = translate(strip)
-    elif (strip[0] == '-'):
-        strip = strip.strip('- ')
+        ret['trans'] = translate(str)
+    elif (str[0] == '-'):
+        str = str.strip('- ')
         ret['topic'] = True
-        ret['trans'] = translate(strip)
+        ret['trans'] = translate(str)
     
-    if (ret['topic'] and strip == ret['trans']):
+    if (ret['topic'] and str == ret['trans']):
         ret['trans'] = ""
 
     return ret
@@ -56,7 +74,7 @@ def is_url_only(line):
     find_url = re.findall(pattern, line)
 
 def is_break(line):
-    if (line[0] == '[' or line[0] == '!'):
+    if (line[0] == '[' or line[0] == '!' or line[0] == '`'):
         return True
     if (line == '\n'):
         return True
@@ -88,6 +106,12 @@ def main():
                 if (text_box != ""):
                     trans_box = translate(text_box)
                     fw.write(trans_box)
+                    fw.flush()
+                    text_box = ""
+
+                tc = trans_comment(line)
+                if (tc['comment']):
+                    line = line.rstrip() + tc['trans'] + '\n'
             else:
                 tt = trans_topic(line)
                 if (tt['topic']):
@@ -103,6 +127,7 @@ def main():
                     text_box += line
 
             fw.write(line)
+            fw.flush()
 
         # 最終行
         if (text_box != ""):
