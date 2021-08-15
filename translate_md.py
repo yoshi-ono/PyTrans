@@ -33,38 +33,39 @@ def translate(text_box):
 def trans_comment(line):
     ret = {'comment' : False, 'trans' : ""}
 
-    str = line.strip()
-    if (str == ''):
+    rip = line.strip()
+    if (rip == ''):
         return ret
         
-    pos = str.find('#')
+    pos = rip.find('#')
     if (pos >= 0):
-        str = str[pos:].strip('# ')
+        rip = rip[pos:].strip('# ')
         ret['comment'] = True
-        ret['trans'] = translate(str)
-
-        if (ret['comment'] and str == ret['trans']):
-            ret['trans'] = ""
+        ret['trans'] = translate(rip)
+    
+    table = str.maketrans({' ': None, '（': '(', '）': ')', '、': ','})
+    if (ret['comment'] and rip.replace(' ', '').lower() == ret['trans'].translate(table).lower()):
+        ret['trans'] = ""
 
     return ret
 
 def trans_topic(line):
     ret = {'topic' : False, 'trans' : ""}
 
-    str = line.strip()
-    if (str == ''):
+    strp = line.strip()
+    if (strp == ''):
         return ret
         
-    if (str[0] == '#'):
-        str = str.strip('# ')
+    if (strp[0] == '#'):
+        strp = strp.strip('# ')
         ret['topic'] = True
-        ret['trans'] = translate(str)
-    elif (str[0] == '-'):
-        str = str.strip('- ')
+        ret['trans'] = translate(strp)
+    elif (strp[0] == '-'):
+        strp = strp.strip('- ')
         ret['topic'] = True
-        ret['trans'] = translate(str)
+        ret['trans'] = translate(strp)
     
-    if (ret['topic'] and str == ret['trans']):
+    if (ret['topic'] and strp == ret['trans']):
         ret['trans'] = ""
 
     return ret
@@ -89,7 +90,7 @@ def name_output_file(input_file):
 def main():
     output_file = name_output_file(input_file)
 
-    fw = open(output_file, 'w')
+    fw = open(output_file, 'w', encoding="utf-8")
 
     text_box = ""
     with open(input_file, 'r', encoding="utf-8") as fr:
@@ -111,7 +112,8 @@ def main():
 
                 tc = trans_comment(line)
                 if (tc['comment']):
-                    line = line.rstrip() + tc['trans'] + '\n'
+                    if (tc['trans'] != ""):
+                        line = line.rstrip() + " {" + tc['trans'] + "}\n"
             else:
                 tt = trans_topic(line)
                 if (tt['topic']):
