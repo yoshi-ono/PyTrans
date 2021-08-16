@@ -124,7 +124,7 @@ class TranslateMd():
                             line = line.rstrip() + "<br>" + tt['trans'] + '\n'
                     elif (self.is_break(line)):
                         if (text_box != ""):
-                            trans_box = self.translate(text_box)
+                            trans_box = "<br>" + self.translate(text_box)
                             fw.write(trans_box)
                             fw.flush()
                             text_box = ""
