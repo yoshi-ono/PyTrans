@@ -1,7 +1,9 @@
 import glob
+import re
 from translate_md import TranslateMd
 
-path = '/Users/YOSHIKI/github/PyLIS'
+#path = '/Users/yoshiki/GitHub/PyLIS.wiki'
+path = '/Users/yoshiki/GitHub/PyTrans'
 exclude_dir = ['venv', 'hsr_meshes']
 
 def main():
@@ -12,9 +14,11 @@ def main():
     expath = tuple([path + '/' + dir for dir in exclude_dir])
 
     for file in files:
-        if (not file.startswith(expath)):
+        if (not file.startswith(expath)
+        and None == re.search(r'_translated_[a-z][a-z].md$', file)):
             search.append(file)
 
+    print("")
     print(search)
 
     for file in search:

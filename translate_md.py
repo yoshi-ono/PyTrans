@@ -4,6 +4,7 @@ import requests
 import pprint
 import json
 import re
+import datetime
 
 api_url = "https://script.google.com/macros/s/AKfycbzKjxnq7rQOY-GDPHIheMeRJ0k_Xc29Xmvi4GL808KFuCQ9pa7DmNGRffAC7qChVoTC/exec"
 source = "en"
@@ -13,7 +14,17 @@ class TranslateMd():
     def __init__(self, md_file) -> None:
         self.input_file = md_file
         self.output_file = self.name_output_file()
+        self.dt_start = datetime.datetime.now()
+        print("")
+        print("START:", self.dt_start)
         print(self.input_file, "=>", self.output_file)
+
+    def __del__(self):
+        print(self.input_file, "=>", self.output_file)
+        dt_end = datetime.datetime.now()
+        print("END:", dt_end)
+        dt_elapsed_time = dt_end - self.dt_start
+        print("elapsed_time: {0}".format(dt_elapsed_time))
 
     def translate(self, text_box):
         print(text_box)
@@ -61,12 +72,24 @@ class TranslateMd():
         if (strp == ''):
             return ret
             
+        match = re.match(r'[1-9a-z]\. ', strp)
+
         if (strp[0] == '#'):
             strp = strp.strip('# ')
             ret['topic'] = True
             ret['trans'] = self.translate(strp)
         elif (strp[0] == '-'):
             strp = strp.strip('- ')
+            if (strp != ""):
+                ret['topic'] = True
+                ret['trans'] = self.translate(strp)
+        elif (strp[0] == '='):
+            strp = strp.strip('= ')
+            if (strp != ""):
+                ret['topic'] = True
+                ret['trans'] = self.translate(strp)
+        elif (match != None):
+            strp = strp[3:].strip()
             ret['topic'] = True
             ret['trans'] = self.translate(strp)
         
@@ -80,7 +103,9 @@ class TranslateMd():
         find_url = re.findall(pattern, line)
 
     def is_break(self, line):
-        if (line[0] == '[' or line[0] == '!' or line[0] == '`'):
+        if (line[0] == '!' or line[0] == '`' or line[0] == '-' or line[0] == '='):
+            return True
+        if (line[0] == '[' and line[1] == '!'):
             return True
         if (line == '\n'):
             return True
@@ -91,6 +116,11 @@ class TranslateMd():
         target_str = "_translated_" + target + ".md"
         output_file_1 = input_file_1.replace(".md"[::-1], target_str[::-1], 1)
         return output_file_1[::-1]
+
+    def trans_box(self, text_box, fw):
+        trans_box = "<br>" + self.translate(text_box.replace('\n', ' ')) + '\n'
+        fw.write(trans_box)
+        fw.flush()
 
     def start(self):
         fw = open(self.output_file, 'w', encoding="utf-8")
@@ -108,9 +138,7 @@ class TranslateMd():
 
                 if in_codeblock:
                     if (text_box != ""):
-                        trans_box = self.translate(text_box)
-                        fw.write(trans_box)
-                        fw.flush()
+                        self.trans_box(text_box, fw)
                         text_box = ""
 
                     tc = self.trans_comment(line)
@@ -124,9 +152,7 @@ class TranslateMd():
                             line = line.rstrip() + "<br>" + tt['trans'] + '\n'
                     elif (self.is_break(line)):
                         if (text_box != ""):
-                            trans_box = "<br>" + self.translate(text_box)
-                            fw.write(trans_box)
-                            fw.flush()
+                            self.trans_box(text_box, fw)
                             text_box = ""
                     else:
                         text_box += line
@@ -136,7 +162,6 @@ class TranslateMd():
 
             # 最終行
             if (text_box != ""):
-                trans_box = self.translate(text_box)
-                fw.write(trans_box)
+                self.trans_box(text_box, fw)
 
         fw.close()

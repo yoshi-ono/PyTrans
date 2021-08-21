@@ -5,13 +5,21 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: search_file.py",
+            "type": "python",
+            "request": "launch",
+            "program": "search_file.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Python: translate.py",
             "type": "python",
             "request": "launch",
             "program": "translate.py",
             "console": "integratedTerminal",
             "args": [
-                "-input", "input.txt"
+                "-input",
+                "input.txt"
             ]
         },
         {
