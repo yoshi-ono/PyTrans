@@ -2,8 +2,8 @@ import glob
 import re
 from translate_md import TranslateMd
 
-#path = '/Users/yoshiki/GitHub/PyLIS.wiki'
-path = '/Users/yoshiki/GitHub/PyTrans'
+path = '/Users/yoshiki/GitHub/PyLIS.wiki'
+#path = '/Users/yoshiki/GitHub/PyTrans'
 exclude_dir = ['venv', 'hsr_meshes']
 
 def main():
@@ -15,7 +15,7 @@ def main():
 
     for file in files:
         if (not file.startswith(expath)
-        and None == re.search(r'_translated_[a-z][a-z].md$', file)):
+        and None == re.search(r'-translated-[a-z][a-z].md$', file)):
             search.append(file)
 
     print("")
@@ -23,7 +23,12 @@ def main():
 
     for file in search:
         transmd = TranslateMd(file)
-        transmd.start()
+
+        if (transmd.translated()):
+            print(file, "translated!")
+        else:
+            transmd.start()
+        
         del transmd
 
 if __name__ == "__main__":

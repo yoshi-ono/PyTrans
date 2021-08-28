@@ -1,5 +1,5 @@
 import argparse
-from os import replace
+from os import path as ospath
 import requests
 import pprint
 import json
@@ -14,12 +14,20 @@ class TranslateMd():
     def __init__(self, md_file) -> None:
         self.input_file = md_file
         self.output_file = self.name_output_file()
+
+    def __del__(self):
+        pass
+
+    def translated(self) -> bool:
+        return ospath.isfile(self.output_file)
+
+    def start_time(self):
         self.dt_start = datetime.datetime.now()
         print("")
         print("START:", self.dt_start)
         print(self.input_file, "=>", self.output_file)
 
-    def __del__(self):
+    def end_time(self):
         print(self.input_file, "=>", self.output_file)
         dt_end = datetime.datetime.now()
         print("END:", dt_end)
@@ -113,7 +121,7 @@ class TranslateMd():
 
     def name_output_file(self):
         input_file_1 = self.input_file[::-1]
-        target_str = "_translated_" + target + ".md"
+        target_str = "-translated-" + target + ".md"
         output_file_1 = input_file_1.replace(".md"[::-1], target_str[::-1], 1)
         return output_file_1[::-1]
 
@@ -123,6 +131,8 @@ class TranslateMd():
         fw.flush()
 
     def start(self):
+        self.start_time()
+
         fw = open(self.output_file, 'w', encoding="utf-8")
 
         text_box = ""
@@ -165,3 +175,5 @@ class TranslateMd():
                 self.trans_box(text_box, fw)
 
         fw.close()
+
+        self.end_time()
