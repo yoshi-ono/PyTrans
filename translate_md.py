@@ -53,6 +53,11 @@ class TranslateMd():
         loadstr = json.loads(r_post.text)
         trans_box = loadstr['text']
         print(trans_box)
+
+        table = str.maketrans({' ': None, '（': '(', '）': ')', '、': ','})
+        if (text_box.replace(' ', '').lower() == trans_box.translate(table).lower()):
+            return ""
+
         return trans_box
 
     def trans_codeblock(self, line):
@@ -67,11 +72,11 @@ class TranslateMd():
             cb = cb[pos:].strip('# ')
             ret['comment'] = True
             ret['trans'] = self.translate(cb)
-        
+        """
         table = str.maketrans({' ': None, '（': '(', '）': ')', '、': ','})
         if (ret['comment'] and cb.replace(' ', '').lower() == ret['trans'].translate(table).lower()):
             ret['trans'] = ""
-
+        """
         return ret
 
     def trans_topic(self, line):
@@ -101,10 +106,10 @@ class TranslateMd():
             strp = strp[3:].strip()
             ret['topic'] = True
             ret['trans'] = self.translate(strp)
-        
+        """
         if (ret['topic'] and strp == ret['trans']):
             ret['trans'] = ""
-
+        """
         return ret
 
     def is_url_only(self, line):
@@ -126,10 +131,12 @@ class TranslateMd():
         output_file_1 = input_file_1.replace(".md"[::-1], target_str[::-1], 1)
         return output_file_1[::-1]
 
-    def trans_box(self, text_box, fw):
-        trans_box = "<br>" + self.translate(text_box.replace('\n', ' ')) + '\n'
-        fw.write(trans_box)
-        fw.flush()
+    def trans_box(self, text_box, fw) -> None:
+        trans_box = self.translate(text_box.replace('\n', ' '))
+        if (trans_box != ""):
+            trans_box = " <br>" + trans_box + '\n'
+            fw.write(trans_box)
+            fw.flush()
 
     def start(self):
         self.start_time()
@@ -160,7 +167,7 @@ class TranslateMd():
                     tt = self.trans_topic(line)
                     if (tt['topic']):
                         if (tt['trans'] != ""):
-                            line = line.rstrip() + "<br>" + tt['trans'] + '\n'
+                            line = line.rstrip() + " <br>" + tt['trans'] + '\n'
                     elif (self.is_break(line)):
                         if (text_box != ""):
                             self.trans_box(text_box, fw)
