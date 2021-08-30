@@ -35,6 +35,7 @@ class TranslateMd():
         print("elapsed_time: {0}".format(dt_elapsed_time))
 
     def translate(self, text_box):
+        text_box = text_box.replace('\\', '')
         print(text_box)
         params = {
             'text': text_box,
@@ -54,21 +55,21 @@ class TranslateMd():
         print(trans_box)
         return trans_box
 
-    def trans_comment(self, line):
+    def trans_codeblock(self, line):
         ret = {'comment' : False, 'trans' : ""}
 
-        rip = line.strip()
-        if (rip == ''):
+        cb = line.strip()
+        if (cb == ''):
             return ret
             
-        pos = rip.find('#')
+        pos = cb.find('#')
         if (pos >= 0):
-            rip = rip[pos:].strip('# ')
+            cb = cb[pos:].strip('# ')
             ret['comment'] = True
-            ret['trans'] = self.translate(rip)
+            ret['trans'] = self.translate(cb)
         
         table = str.maketrans({' ': None, '（': '(', '）': ')', '、': ','})
-        if (ret['comment'] and rip.replace(' ', '').lower() == ret['trans'].translate(table).lower()):
+        if (ret['comment'] and cb.replace(' ', '').lower() == ret['trans'].translate(table).lower()):
             ret['trans'] = ""
 
         return ret
@@ -151,7 +152,7 @@ class TranslateMd():
                         self.trans_box(text_box, fw)
                         text_box = ""
 
-                    tc = self.trans_comment(line)
+                    tc = self.trans_codeblock(line)
                     if (tc['comment']):
                         if (tc['trans'] != ""):
                             line = line.rstrip() + " {" + tc['trans'] + "}\n"
