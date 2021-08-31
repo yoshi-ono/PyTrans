@@ -9,7 +9,7 @@ Markdownファイル(.md)の翻訳を支援します。
 README.md ===> README-translated-ja.md
 ```
 
-## 準備
+## 翻訳APIの準備
 GAS(Google Apps Script) に `main.gs`(<= `main.js`) を登録します。
 https://script.google.com/home
 
