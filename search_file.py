@@ -2,8 +2,7 @@ import glob
 import re
 from translate_md import TranslateMd
 
-path = '/Users/yoshiki/GitHub/PyLIS.wiki'
-#path = '/Users/yoshiki/GitHub/PyTrans'
+path = '/Users/yoshiki/GitHub/WM_Hackathon.wiki'
 exclude_dir = ['venv', 'hsr_meshes']
 
 def main():
