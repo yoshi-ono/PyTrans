@@ -102,6 +102,11 @@ class TranslateMd():
             if (strp != ""):
                 ret['topic'] = True
                 ret['trans'] = self.translate(strp)
+        elif (strp[0] == '*' and strp[1] == ' '):
+            strp = strp.strip('* ')
+            if (strp != ""):
+                ret['topic'] = True
+                ret['trans'] = self.translate(strp)
         elif (match != None):
             strp = strp[3:].strip()
             ret['topic'] = True
@@ -166,6 +171,9 @@ class TranslateMd():
                 else:
                     tt = self.trans_topic(line)
                     if (tt['topic']):
+                        if (text_box != ""):
+                            self.trans_box(text_box, fw)
+                            text_box = ""
                         if (tt['trans'] != ""):
                             line = line.rstrip() + " <br>" + tt['trans'] + '\n'
                     elif (self.is_break(line)):
