@@ -5,38 +5,44 @@ import pprint
 import json
 import re
 import datetime
+import threading
 
 api_url = "https://script.google.com/macros/s/AKfycbzKjxnq7rQOY-GDPHIheMeRJ0k_Xc29Xmvi4GL808KFuCQ9pa7DmNGRffAC7qChVoTC/exec"
 source = "en"
 target = "ja"
 
-class TranslateMd():
-    def __init__(self, md_file) -> None:
+class TranslateMd(threading.Thread):
+    def __init__(self, md_file, thread_no) -> None:
         self.input_file = md_file
         self.output_file = self.name_output_file()
+        self.thread_no = thread_no
+        threading.Thread.__init__(self)
 
     def __del__(self):
         pass
 
     def translated(self) -> bool:
-        return ospath.isfile(self.output_file)
+        if ospath.isfile(self.output_file):
+            print("---------------------------------------------------------------------------")
+            print("[{0}] {1} is translated!".format(self.thread_no, self.input_file))
+            return True
+        else:
+            return False
 
     def start_time(self):
         self.dt_start = datetime.datetime.now()
-        print("")
-        print("START:", self.dt_start)
-        print(self.input_file, "=>", self.output_file)
+        print("---------------------------------------------------------------------------")
+        print("[{0}] {1} START: {2}".format(self.thread_no, self.input_file, self.dt_start))
 
     def end_time(self):
-        print(self.input_file, "=>", self.output_file)
-        dt_end = datetime.datetime.now()
-        print("END:", dt_end)
-        dt_elapsed_time = dt_end - self.dt_start
-        print("elapsed_time: {0}".format(dt_elapsed_time))
+        self.dt_end = datetime.datetime.now()
+        dt_elapsed_time = self.dt_end - self.dt_start
+        print("---------------------------------------------------------------------------")
+        print("[{0}] {1} END: {2}".format(self.thread_no, self.input_file, self.dt_end))
+        print("[{0}] elapsed_time: {1}".format(self.thread_no, dt_elapsed_time))
 
     def translate(self, text_box):
         text_box = text_box.replace('\\', '')
-        print(text_box)
         params = {
             'text': text_box,
             'source': source,
@@ -52,7 +58,9 @@ class TranslateMd():
 
         loadstr = json.loads(r_post.text)
         trans_box = loadstr['text']
-        print(trans_box)
+        print("---------------------------------------------------------------------------")
+        print("[{0}:{1}] {2}".format(self.thread_no, source, text_box))
+        print("[{0}:{1}] {2}".format(self.thread_no, target, trans_box))
 
         table = str.maketrans({' ': None, '（': '(', '）': ')', '、': ','})
         if (text_box.replace(' ', '').lower() == trans_box.translate(table).lower()):
@@ -143,7 +151,10 @@ class TranslateMd():
             fw.write(trans_box)
             fw.flush()
 
-    def start(self):
+    def run(self):
+        if (self.translated()):
+            return
+
         self.start_time()
 
         fw = open(self.output_file, 'w', encoding="utf-8")

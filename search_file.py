@@ -1,5 +1,6 @@
 import glob
 import re
+import time
 from translate_md import TranslateMd
 
 path = '/Users/yoshiki/GitHub/WM_Hackathon.wiki'
@@ -20,15 +21,12 @@ def main():
     print("")
     print(search)
 
+    count = 0
     for file in search:
-        transmd = TranslateMd(file)
-
-        if (transmd.translated()):
-            print(file, "translated!")
-        else:
-            transmd.start()
-        
-        del transmd
+        transmd = TranslateMd(file, count)
+        count += 1
+        transmd.start()
+        time.sleep(1)
 
 if __name__ == "__main__":
     main()
