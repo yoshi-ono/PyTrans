@@ -23,23 +23,23 @@ class TranslateMd(threading.Thread):
 
     def translated(self) -> bool:
         if ospath.isfile(self.output_file):
-            print("---------------------------------------------------------------------------")
-            print("[{0}] {1} is translated!".format(self.thread_no, self.input_file))
+            print("----------------------------------------------------------------------")
+            print("[{0}] Skip> {1} is translated!".format(self.thread_no, self.input_file))
             return True
         else:
             return False
 
     def start_time(self):
         self.dt_start = datetime.datetime.now()
-        print("---------------------------------------------------------------------------")
-        print("[{0}] {1} START: {2}".format(self.thread_no, self.input_file, self.dt_start))
+        print("-----------------------------------------", self.dt_start)
+        print("[{0}] Start> {1}".format(self.thread_no, self.input_file))
 
     def end_time(self):
         self.dt_end = datetime.datetime.now()
         dt_elapsed_time = self.dt_end - self.dt_start
-        print("---------------------------------------------------------------------------")
-        print("[{0}] {1} END: {2}".format(self.thread_no, self.input_file, self.dt_end))
-        print("[{0}] elapsed_time: {1}".format(self.thread_no, dt_elapsed_time))
+        print("---------------------------------------------", self.dt_end)
+        print("[{0}] Create> {1}".format(self.thread_no, self.output_file))
+        print("[{0}] Elapsed time> {1}".format(self.thread_no, dt_elapsed_time))
 
     def translate(self, text_box):
         text_box = text_box.replace('\\', '')
@@ -58,9 +58,9 @@ class TranslateMd(threading.Thread):
 
         loadstr = json.loads(r_post.text)
         trans_box = loadstr['text']
-        print("---------------------------------------------------------------------------")
-        print("[{0}:{1}] {2}".format(self.thread_no, source, text_box))
-        print("[{0}:{1}] {2}".format(self.thread_no, target, trans_box))
+        print("--------------------------------------------------------")
+        print("[{0}] {1}> {2}".format(self.thread_no, source, text_box))
+        print("[{0}] {1}> {2}".format(self.thread_no, target, trans_box))
 
         table = str.maketrans({' ': None, '（': '(', '）': ')', '、': ','})
         if (text_box.replace(' ', '').lower() == trans_box.translate(table).lower()):
@@ -144,10 +144,20 @@ class TranslateMd(threading.Thread):
         output_file_1 = input_file_1.replace(".md"[::-1], target_str[::-1], 1)
         return output_file_1[::-1]
 
+    def has_br(self, text_box):
+        match = re.search(r'  \n$', text_box)
+        if (match == None):
+            return False
+        else:
+            return True
+
     def trans_box(self, text_box, fw) -> None:
         trans_box = self.translate(text_box.replace('\n', ' '))
         if (trans_box != ""):
-            trans_box = " <br>" + trans_box + '\n'
+            if self.has_br(text_box):
+                trans_box = " " + trans_box + '\n'
+            else:
+                trans_box = " <br>" + trans_box + '\n'
             fw.write(trans_box)
             fw.flush()
 
