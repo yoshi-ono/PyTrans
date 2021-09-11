@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: search_ipynb_file.py",
+            "type": "python",
+            "request": "launch",
+            "program": "search_ipynb_file.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Python: search_file.py",
             "type": "python",
             "request": "launch",
